@@ -5,13 +5,17 @@ import {
   Program,
   Wallet,
 } from "@coral-xyz/anchor";
-import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  getOrCreateAssociatedTokenAccount,
+} from "@solana/spl-token";
 import {
   Commitment,
   Connection,
   Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
+  SystemProgram,
 } from "@solana/web3.js";
 import wallet from "../wba-wallet.json";
 import { IDL, WbaVault } from "./programs/wba_vault";
@@ -44,17 +48,17 @@ const vaultState = new PublicKey(
 
 // Create the PDA for our enrollment account
 // Seeds are "auth", vaultState
-const vaultAuth = [Buffer.from("auth"), vaultState.toBuffer()];
-const [vaultAuthKey, _bump] = PublicKey.findProgramAddressSync(
-  vaultAuth,
+const vaultAuthKeys = [Buffer.from("auth"), vaultState.toBuffer()];
+const [vaultAuth, _bump] = PublicKey.findProgramAddressSync(
+  vaultAuthKeys,
   program.programId
 );
 
 // Create the vault key
 // Seeds are "vault", vaultAuth
-const vault = [Buffer.from("vault"), vaultAuthKey.toBuffer()];
-const [vaultKey, _bump2] = PublicKey.findProgramAddressSync(
-  vault,
+const vaultKeys = [Buffer.from("vault"), vaultAuth.toBuffer()];
+const [vault, _bump2] = PublicKey.findProgramAddressSync(
+  vaultKeys,
   program.programId
 );
 
@@ -71,35 +75,32 @@ const mint = new PublicKey("7VnSNSWRpu4VuAaxMKXrAJKKLJgdNeZGWXoWifSmSGFj");
       connection,
       keypair,
       mint,
-      keypair.publicKey
+      keypair.publicKey,
+      undefined,
+      commitment
     );
     // Get the token account of the fromWallet address, and if it does not exist, create it
     const vaultAta = await getOrCreateAssociatedTokenAccount(
       connection,
       keypair,
       mint,
-      vaultKey,
+      vaultAuth,
       true,
       commitment
     );
 
-    console.log("vaultAta", vaultAta.address.toBase58());
     const signature = await program.methods
-      .depositSpl(new BN(LAMPORTS_PER_SOL))
+      .depositSpl(new BN(1n * token_decimals))
       .accounts({
         owner: keypair.publicKey,
-        vaultState: vaultState,
-        vaultAuth: vaultAuthKey,
-        systemProgram: PublicKey.default,
+        vaultState,
+        vaultAuth,
+        systemProgram: SystemProgram.programId,
         ownerAta: ownerAta.address,
         vaultAta: vaultAta.address,
         tokenMint: mint,
-        tokenProgram: new PublicKey(
-          "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        ),
-        associatedTokenProgram: new PublicKey(
-          "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        ),
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
       })
       .signers([keypair])
       .rpc();
@@ -107,6 +108,10 @@ const mint = new PublicKey("7VnSNSWRpu4VuAaxMKXrAJKKLJgdNeZGWXoWifSmSGFj");
     console.log(
       `Deposit success! Check out your TX here:\n\nhttps://explorer.solana.com/tx/${signature}?cluster=devnet`
     );
+
+    // https://explorer.solana.com/tx/9i5EY7ZNpR39sB2EktMzHBe861qVfKi39FY4sXLPHwMnJVMvP7LafdDfsH9nQKAfz6zPmA9phELA6Ti3YumYm14?cluster=devnet
+
+    // PENDING
   } catch (e) {
     console.error(JSON.stringify(e));
     console.error(`Oops, something went wrong: ${e}`);
