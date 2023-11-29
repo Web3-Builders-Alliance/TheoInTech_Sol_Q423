@@ -57,7 +57,7 @@ const [vaultAuth, _bump] = PublicKey.findProgramAddressSync(
 // Create the vault key
 // Seeds are "vault", vaultAuth
 const vaultKeys = [Buffer.from("vault"), vaultAuth.toBuffer()];
-const [vault, _bump2] = PublicKey.findProgramAddressSync(
+const [_vault, _bump2] = PublicKey.findProgramAddressSync(
   vaultKeys,
   program.programId
 );
