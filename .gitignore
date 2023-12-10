@@ -5,3 +5,6 @@ yarn.lock
 
 # Wallets
 *wallet.json
+
+# Test
+test-ledger/*
