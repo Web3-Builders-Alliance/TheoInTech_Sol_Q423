@@ -2,11 +2,12 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Milestones {
+    // qq:
     pub project: PubKey,
     pub fund_disbursed: u64,
     pub receiver: PubKey,
     pub deadline: u64,
-    pub metadata: String,
+    pub milestones_metadata: String,
     pub bump: u8,
     pub milestone_polls_bump: u8,
 }
@@ -19,7 +20,7 @@ impl Space for Milestones {
 pub struct MilestonePolls {
     pub poll_start_date: u64,
     pub poll_end_date: u64,
-    pub metadata: String,
+    pub milestone_polls_metadata: String,
     pub vote_count: u16,
     pub bump: u8,
     pub vote_bump: u8,

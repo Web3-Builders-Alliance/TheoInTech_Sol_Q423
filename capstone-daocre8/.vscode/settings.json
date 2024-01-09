@@ -1,0 +1,8 @@
+{
+  "rust-analyzer.linkedProjects": [
+    "./programs/capstone-daocre8/Cargo.toml",
+    "./programs/capstone-daocre8/Cargo.toml",
+    "./programs/capstone-daocre8/Cargo.toml"
+  ],
+  "rust-analyzer.showUnlinkedFileNotification": false
+}

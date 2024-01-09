@@ -14,9 +14,9 @@ pub struct Initialize<'info> {
     // The marketplace PDA we're creating is a new account, so we need to pay for it
     #[account(
         init,
-        space = Marketplace::INIT_SPACE
+        space = Marketplace::INIT_SPACE,
         payer = admin,
-        seeds = [b"marketplace", name.as_str.as_bytes()],
+        seeds = [b"marketplace", name.as_str().as_bytes()],
         bump
     )]
     marketplace: Account<'info, Marketplace>,
