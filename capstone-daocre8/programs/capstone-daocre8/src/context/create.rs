@@ -3,17 +3,23 @@ use anchor_spl::{
     token_interface::{ TokenAccount, Mint, TokenInterface, TransferChecked, transfer_checked },
     metadata::{ Metadata, MetadataAccount, MasterEditionAccount },
     associated_token::AssociatedToken,
+    token::{ transfer, Transfer },
 };
 
-pub use crate::state::{ Creator, ProjectDAO, Milestones, Treasury, Rewards };
+pub use crate::state::{ Creator, ProjectDAO, Milestone, Reward };
 
-pub use crate::errors::ProjectDAOError;
+pub use crate::errors::{ ProjectDAOError, MilestoneError, RewardError };
 
 #[derive(Accounts)]
-#[instruction(identifier: String)]
+#[instruction(identifier: String, milestone_idx: u8, reward_idx: u8)]
 pub struct Create<'info> {
     #[account(mut)]
     signer: Signer<'info>,
+    /*
+     * DAOCre-8 Vault
+     */
+    #[account(mut, seeds = [b"daocre-8"], bump)]
+    vault: SystemAccount<'info>,
     /*
      * Creator
      */
@@ -68,34 +74,26 @@ pub struct Create<'info> {
         seeds = [b"projectdao", creator.key().as_ref(), identifier.as_str().as_bytes()],
         bump
     )]
+    // Consider using Box if we reach the limit
     project_dao: Account<'info, ProjectDao>,
-    /*
-     * qq: There will be one or more Milestones once the ProjectDAO is created. How do I initialize them?
-     */
     #[account(
         init,
         payer = signer,
-        space = Milestones::INIT_SPACE,
-        seeds = [b"milestones", project_dao.key().as_ref()],
+        space = Milestone::INIT_SPACE,
+        seeds = [b"milestone", milestone_idx.as_str().as_bytes(), project_dao.key().as_ref()],
         bump
     )]
-    milestones: Account<'info, Milestones>,
-    /*
-     * qq: Who should be the owner of the Treasury? It shouldn't be the DAOCre-8 team and the creator so that no one can withdraw the funds, and should just be controlled by the program.
-     */
-    #[account(seeds = [b"treasury", project_dao.key().as_ref(), bump], bump)]
+    milestone: Account<'info, Milestone>,
+    #[account(seeds = [b"treasury", project_dao.key().as_ref()], bump)]
     treasury: SystemAccount<'info>,
-    /*
-     * qq: There will be one or more Rewards once the ProjectDAO is created. How do I initialize them?
-     */
     #[account(
         init,
         payer = signer,
-        space = Rewards::INIT_SPACE,
-        seeds = [b"rewards", project_dao.key().as_ref()],
+        space = Reward::INIT_SPACE,
+        seeds = [b"reward", reward_idx.as_str().as_bytes(), project_dao.key().as_ref()],
         bump
     )]
-    rewards: Account<'info, Rewards>,
+    reward: Account<'info, Reward>,
     /*
      * System
      */
@@ -104,9 +102,19 @@ pub struct Create<'info> {
 }
 
 impl<'info> Create<'info> {
+    pub fn initialize_creator(&mut self) -> Result<()> {
+        self.creator.set_inner(Creator {
+            signer: self.signer.key(),
+            project_dao_count: 1,
+            bump: bumps.creator,
+            project_dao_bump: bumps.project_dao,
+        });
+
+        Ok(())
+    }
+
     pub fn create_project_dao(
         &mut self,
-        // ProjectDAO
         identifier: String,
         funding_goal: u64,
         initial_capital: u64,
@@ -114,29 +122,13 @@ impl<'info> Create<'info> {
         funding_end_date: u64,
         detail_metadata: String,
         updates_metadata: String,
-        fee: u16,
-        // Milestones
-        fund_disbursed: u64,
-        receiver: PubKey,
-        deadline: u64,
-        milestones_metadata: String,
-        // Treasury
-        // Rewards
         bumps: &InitializeBumps
     ) -> Result<()> {
-        // Validations
         require!(identifier.len() > 0 && identifier.len() < 33, ProjectDAOError::IdentifierTooLong);
         require!(
             !ProjectDAO::exists(&self.project_dao.key(), ProjectDAOError::IdentifierAlreadyExists)
         );
 
-        // Initialize Creator, then ProjectDAO, Milestones, Treasury, and Rewards
-        self.creator.set_inner(Creator {
-            signer: self.signer.key(),
-            project_dao_count: 1,
-            bump: bumps.creator,
-            project_dao_bump: bumps.project_dao,
-        });
         self.project_dao.set_inner(ProjectDAO {
             admin: self.signer.key(),
             identifier,
@@ -148,25 +140,69 @@ impl<'info> Create<'info> {
             updates_metadata,
             bump: bumps.project_dao,
             treasury_bump: bumps.treasury,
-            milestones_bump: bumps.milestones,
-            rewards_bump: bumps.rewards,
+            milestone_bump: bumps.milestone,
+            reward_bump: bumps.reward,
         });
 
-        // qq: I need to initialize multiple Milestones when creating the ProjectDAO, how do I do it in the same instruction?
-        // self.milestones.set_inner(Milestones {
-        //     project: self.project_dao.key(),
-        //     fund_disbursed,
-        //     receiver: self.signer.key(),
-        //     deadline,
-        //     milestones_metadata,
-        //     bump: bumps.milestones,
-        //     milestone_polls_bump: bumps.milestone_polls,
-        // });
+        Ok(())
+    }
 
-        // Transfer the SOL fee to the DAOCre-8 Treasury wallet
+    pub fn create_milestone(
+        &mut self,
+        milestone_idx: u8,
+        fund_disbursed: u64,
+        receiver: PubKey,
+        deadline: u64,
+        milestone_metadata: String,
+        bumps: &InitializeBumps
+    ) -> Result<()> {
+        require!(milestone_idx > 0, MilestoneError::MilestoneCannotBeEmpty);
 
-        // Mint and Transfer DAOCre-8 NFT
+        self.milestone.set_inner(Milestone {
+            project: self.project_dao.key(),
+            fund_disbursed,
+            receiver: self.signer.key(),
+            deadline,
+            milestone_metadata,
+            bump: bumps.milestone,
+            milestone_poll_bump: bumps.milestone_poll,
+        });
 
-        // qq: Is it still a good idea to have an instruction as huge as this? If not, how do I split it up?
+        Ok(())
+    }
+
+    pub fn create_reward(
+        &mut self,
+        reward_idx: u8,
+        price: u64,
+        reward_metadata: String,
+        bumps: &InitializeBumps
+    ) -> Result<()> {
+        equire!(reward_idx > 0, RewardError::RewardCannotBeEmpty);
+
+        self.reward.set_inner(Reward {
+            project: self.project_dao.key(),
+            price,
+            reward_metadata,
+            bump: bumps.reward,
+        });
+
+        Ok(())
+    }
+
+    pub fn deposit_fee(&mut self, fee: u64) -> Result<()> {
+        let accounts = Transfer {
+            from: ctx.accounts.signer.to_account_info(),
+            to: ctx.accounts.vault.to_account_info(),
+        };
+
+        let cpi_ctx = CpiContext::new(self.system_program.to_account_info(), accounts);
+
+        transfer(cpi_ctx, fee)
+    }
+
+    // Finish this instruction from metaplex(?)
+    pub fn mint_nft(&mut self) -> Result<()> {
+        Ok(())
     }
 }

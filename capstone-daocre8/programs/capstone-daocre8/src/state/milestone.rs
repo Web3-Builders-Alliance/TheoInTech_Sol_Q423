@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[account]
-pub struct Milestones {
-    // qq:
+pub struct Milestone {
     pub project: PubKey,
     pub fund_disbursed: u64,
     pub receiver: PubKey,
@@ -12,12 +11,12 @@ pub struct Milestones {
     pub milestone_polls_bump: u8,
 }
 
-impl Space for Milestones {
+impl Space for Milestone {
     const INIT_SPACE: usize = 8 + 32 + 8 + 32 + 8 + (4 + 32) + 1 + 1;
 }
 
 #[account]
-pub struct MilestonePolls {
+pub struct MilestonePoll {
     pub poll_start_date: u64,
     pub poll_end_date: u64,
     pub milestone_polls_metadata: String,
@@ -26,17 +25,17 @@ pub struct MilestonePolls {
     pub vote_bump: u8,
 }
 
-impl Space for MilestonePolls {
+impl Space for MilestonePoll {
     const INIT_SPACE: usize = 8 + 8 + 8 + (4 + 32) + 2 + 1 + 1;
 }
 
 #[account]
-pub struct MilestonePollsVote {
+pub struct MilestonePollVote {
     pub voter: PubKey,
     pub vote: u8,
     pub bump: u8,
 }
 
-impl Space for MilestonePollsVote {
+impl Space for MilestonePollVote {
     const INIT_SPACE: usize = 8 + 32 + 1 + 1;
 }
