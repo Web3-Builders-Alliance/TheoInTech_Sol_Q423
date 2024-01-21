@@ -6,7 +6,7 @@ pub struct Milestone {
     pub fund_disbursed: u64,
     pub receiver: PubKey,
     pub deadline: u64,
-    pub milestones_metadata: String,
+    pub milestone_metadata: String,
     pub bump: u8,
     pub milestone_polls_bump: u8,
 }

@@ -1,13 +1,12 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    token_interface::{ TokenAccount, Mint, TokenInterface, TransferChecked, transfer_checked },
+    token_interface::{ TokenAccount, Mint, TokenInterface },
     metadata::{ Metadata, MetadataAccount, MasterEditionAccount },
     associated_token::AssociatedToken,
     token::{ transfer, Transfer },
 };
 
 pub use crate::state::{ Creator, ProjectDAO, Milestone, Reward };
-
 pub use crate::errors::{ ProjectDAOError, MilestoneError, RewardError };
 
 #[derive(Accounts)]
@@ -49,18 +48,7 @@ pub struct Create<'info> {
         constraint = metadata.collection.as_ref().unwrap().key.as_ref() ==
         collection_mint.key().as_ref()
     )]
-    metadata: Account<'info, MetadataAccount>,
-    #[account(
-        seeds = [
-            b"metadata",
-            metadata_program.key().as_ref(),
-            maker_mint.key().as_ref(),
-            b"edition",
-        ],
-        seeds::program = metadata_program.key(),
-        bump
-    )]
-    master_edition: Account<'info, MasterEditionAccount>,
+    metadata_account: Account<'info, MetadataAccount>,
     metadata_program: Program<'info, Metadata>,
     associated_token_program: Program<'info, AssociatedToken>,
     /*
@@ -85,6 +73,9 @@ pub struct Create<'info> {
     )]
     milestone: Account<'info, Milestone>,
     #[account(seeds = [b"treasury", project_dao.key().as_ref()], bump)]
+    /*
+     * Funding
+     */
     treasury: SystemAccount<'info>,
     #[account(
         init,
@@ -201,8 +192,17 @@ impl<'info> Create<'info> {
         transfer(cpi_ctx, fee)
     }
 
-    // Finish this instruction from metaplex(?)
     pub fn mint_nft(&mut self) -> Result<()> {
+        // system_program::create_account(
+        //     CpiContext::new(self.token_program.to_account_info(), system_program::CreateAccount {
+        //         from: self.collection_mint.to_account_info(),
+        //         to: self.creator_mint.to_account_info(),
+        //     }),
+        //     10000000,
+        //     82,
+        //     &self.token_program.key()
+        // )?;
+
         Ok(())
     }
 }
