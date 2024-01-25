@@ -16,7 +16,7 @@ impl Space for UpdatePoll {
 
 #[account]
 pub struct UpdatePollVote {
-    pub voter: PubKey,
+    pub voter: Pubkey,
     pub vote: String,
     pub bump: u8,
 }

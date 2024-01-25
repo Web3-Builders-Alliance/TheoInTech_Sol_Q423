@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Reward {
-    pub project: PubKey,
+    pub project: Pubkey,
     pub price: u64,
     pub reward_metadata: String,
     pub bump: u8,

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Creator {
-    pub signer: PubKey,
+    pub signer: Pubkey,
     pub project_dao_count: u8,
     pub bump: u8,
     pub project_dao_bump: u8,
