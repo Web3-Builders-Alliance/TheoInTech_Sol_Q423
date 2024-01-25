@@ -148,7 +148,6 @@ impl<'info> Create<'info> {
         &mut self,
         milestone_idx: String,
         fund_disbursed: u64,
-        receiver: Pubkey,
         deadline: u64,
         milestone_metadata: String,
         bumps: &CreateBumps
@@ -186,7 +185,7 @@ impl<'info> Create<'info> {
         Ok(())
     }
 
-    pub fn deposit_fee(&mut self, fee: u64, bumps: &CreateBumps) -> Result<()> {
+    pub fn deposit_fee(&mut self, fee: u64) -> Result<()> {
         let accounts = Transfer {
             from: self.signer.to_account_info(),
             to: self.vault.to_account_info(),
