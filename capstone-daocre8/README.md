@@ -29,4 +29,4 @@ DAOCre-8 (pronounced as /daʊ- krē- āt/ ; with ‘8’ symbolizing a Lemniscat
 | Backer NFT Metadata      | [https://arweave.net/6F2xOhXW_5p3thIKu4m7IGeW-BYVFk_R8XoiIUMkMJ8](https://arweave.net/6F2xOhXW_5p3thIKu4m7IGeW-BYVFk_R8XoiIUMkMJ8)              |
 | Creator cNFT Merkle Tree | [CNr5kujH2UPbLVNQ6wZ3NkfEwiQJuR9BD2GYTGWAj1i4](https://explorer.solana.com/address/CNr5kujH2UPbLVNQ6wZ3NkfEwiQJuR9BD2GYTGWAj1i4?cluster=devnet) |
 | Program ID               | [AwjhMae1WRzopt1CvbCxnHbwys11yqdFTiJtNgTRgzJR](https://explorer.solana.com/address/AwjhMae1WRzopt1CvbCxnHbwys11yqdFTiJtNgTRgzJR?cluster=devnet) |
-| IDL Account              | [5LpXdsCTJDCLGNx433LxgD9tsvUG3mf4Y747nMq5nFzY](https://explorer.solana.com/address/5LpXdsCTJDCLGNx433LxgD9tsvUG3mf4Y747nMq5nFzY?cluster=devnet) |
+| IDL Account              | [Faa3WaCJ8q5HtXGkSqcR83DXvTHMGP2XdddyXf1jyLDa](https://explorer.solana.com/address/Faa3WaCJ8q5HtXGkSqcR83DXvTHMGP2XdddyXf1jyLDa?cluster=devnet) |
