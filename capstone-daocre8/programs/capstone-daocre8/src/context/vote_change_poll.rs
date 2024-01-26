@@ -1,11 +1,11 @@
 use anchor_lang::prelude::*;
 
-pub use crate::state::{ Creator, ProjectDAO, ChangePoll, ChangePollOption };
+pub use crate::state::{ Creator, ProjectDAO, ChangePoll, ChangePollOption, ChangePollVote };
 pub use crate::errors::{ ProjectDAOError, RewardError };
 
 #[derive(Accounts)]
 #[instruction(project_dao_idx: String, change_poll_idx: String)]
-pub struct PostChangePoll<'info> {
+pub struct VoteChangePoll<'info> {
     #[account(mut)]
     signer: Signer<'info>,
     /*
@@ -23,60 +23,50 @@ pub struct PostChangePoll<'info> {
     )]
     project_dao: Account<'info, ProjectDAO>, // Consider using Box if we reach the limit
     #[account(
-        init,
-        payer = signer,
-        space = ChangePoll::INIT_SPACE,
         seeds = [b"changepoll", change_poll_idx.as_str().as_bytes(), project_dao.key().as_ref()],
         bump
     )]
     change_poll: Account<'info, ChangePoll>,
     #[account(
-        init,
-        payer = signer,
-        space = ChangePollOption::INIT_SPACE,
         seeds = [b"changepolloption", change_poll.key().as_ref(), project_dao.key().as_ref()],
         bump
     )]
     change_poll_option: Account<'info, ChangePollOption>,
+    #[account(
+        init,
+        payer = signer,
+        space = ChangePollVote::INIT_SPACE,
+        seeds = [b"changepollvote", change_poll.key().as_ref(), project_dao.key().as_ref()],
+        bump
+    )]
+    change_poll_vote: Account<'info, ChangePollVote>,
     /*
      * System
      */
     system_program: Program<'info, System>,
 }
 
-impl<'info> PostChangePoll<'info> {
-    pub fn post_change_poll(
+impl<'info> VoteChangePoll<'info> {
+    pub fn vote_change_poll_option(
         &mut self,
+        change_idx: String,
         change_poll_idx: String,
-        poll_start_date: u64,
-        poll_end_date: u64,
-        metadata: String,
-        bumps: &PostChangePollBumps
+        vote: u8,
+        bumps: &VoteChangePollBumps
     ) -> Result<()> {
-        self.change_poll.set_inner(ChangePoll {
-            change_poll_idx,
-            poll_start_date,
-            poll_end_date,
-            metadata,
-            total_vote_count: 0,
-            bump: bumps.change_poll,
-            option_bump: bumps.change_poll_option,
+        let change_poll = &mut self.change_poll;
+        let change_poll_option = &mut self.change_poll_option;
+
+        change_poll.total_vote_count = change_poll.total_vote_count.checked_add(1).unwrap();
+        change_poll_option.option_vote_count = change_poll_option.option_vote_count
+            .checked_add(1)
+            .unwrap();
+
+        self.change_poll_vote.set_inner(ChangePollVote {
+            voter: self.signer.key(),
+            vote,
+            bump: bumps.change_poll_vote,
         });
-
-        Ok(())
-    }
-
-    pub fn add_change_poll_option(
-        &mut self,
-        option: String,
-        bumps: &PostChangePollBumps
-    ) -> Result<()> {
-        self.change_poll_option.set_inner(ChangePollOption {
-            option,
-            option_vote_count: 0,
-            bump: bumps.change_poll_option,
-        });
-
         Ok(())
     }
 }

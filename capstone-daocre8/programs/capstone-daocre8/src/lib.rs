@@ -70,7 +70,8 @@ pub mod capstone_daocre8 {
         change_poll_idx: String,
         poll_start_date: u64,
         poll_end_date: u64,
-        metadata: String
+        metadata: String,
+        option: String
     ) -> Result<()> {
         ctx.accounts.post_change_poll(
             change_poll_idx,
@@ -78,7 +79,8 @@ pub mod capstone_daocre8 {
             poll_end_date,
             metadata,
             &ctx.bumps
-        )
+        );
+        ctx.accounts.add_change_poll_option(option, &ctx.bumps)
     }
 
     pub fn post_milestone_poll(
@@ -97,5 +99,14 @@ pub mod capstone_daocre8 {
             milestone_polls_metadata,
             &ctx.bumps
         )
+    }
+
+    pub fn vote_milestone_poll(
+        ctx: Context<VoteMilestonePoll>,
+        milestone_idx: String,
+        milestone_poll_idx: String,
+        vote: u8
+    ) -> Result<()> {
+        ctx.accounts.vote_milestone_poll(milestone_idx, milestone_poll_idx, vote, &ctx.bumps)
     }
 }

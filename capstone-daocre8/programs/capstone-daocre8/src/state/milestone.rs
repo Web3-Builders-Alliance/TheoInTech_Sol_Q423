@@ -22,7 +22,7 @@ pub struct MilestonePoll {
     pub poll_start_date: u64,
     pub poll_end_date: u64,
     pub milestone_polls_metadata: String,
-    pub vote_count: u16,
+    pub total_vote_count: u16,
     pub bump: u8,
     // pub vote_bump: u8,
 }

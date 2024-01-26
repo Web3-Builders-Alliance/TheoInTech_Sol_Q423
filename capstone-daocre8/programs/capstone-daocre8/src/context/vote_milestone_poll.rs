@@ -1,11 +1,11 @@
 use anchor_lang::prelude::*;
 
-pub use crate::state::{ Creator, ProjectDAO, Milestone, MilestonePoll };
+pub use crate::state::{ Creator, ProjectDAO, Milestone, MilestonePoll, MilestonePollVote };
 pub use crate::errors::{ ProjectDAOError, RewardError };
 
 #[derive(Accounts)]
 #[instruction(project_dao_idx: String, milestone_idx: String, milestone_poll_idx: String)]
-pub struct PostMilestonePoll<'info> {
+pub struct VoteMilestonePoll<'info> {
     #[account(mut)]
     signer: Signer<'info>,
     /*
@@ -28,9 +28,6 @@ pub struct PostMilestonePoll<'info> {
     )]
     milestone: Account<'info, Milestone>,
     #[account(
-        init,
-        payer = signer,
-        space = MilestonePoll::INIT_SPACE,
         seeds = [
             b"milestonepoll",
             milestone.key().as_ref(),
@@ -40,31 +37,36 @@ pub struct PostMilestonePoll<'info> {
         bump
     )]
     milestone_poll: Account<'info, MilestonePoll>,
+    #[account(
+        init,
+        payer = signer,
+        space = MilestonePollVote::INIT_SPACE,
+        seeds = [b"milestonepollvote", milestone_poll.key().as_ref(), project_dao.key().as_ref()],
+        bump
+    )]
+    milestone_poll_vote: Account<'info, MilestonePollVote>,
     /*
      * System
      */
     system_program: Program<'info, System>,
 }
 
-impl<'info> PostMilestonePoll<'info> {
-    pub fn post_milestone_poll(
+impl<'info> VoteMilestonePoll<'info> {
+    pub fn vote_milestone_poll(
         &mut self,
         milestone_idx: String,
         milestone_poll_idx: String,
-        poll_start_date: u64,
-        poll_end_date: u64,
-        milestone_polls_metadata: String,
-        bumps: &PostMilestonePollBumps
+        vote: u8,
+        bumps: &VoteMilestonePollBumps
     ) -> Result<()> {
-        self.milestone_poll.set_inner(MilestonePoll {
-            milestone_poll_idx,
-            poll_start_date,
-            poll_end_date,
-            milestone_polls_metadata,
-            total_vote_count: 0,
-            bump: bumps.milestone_poll,
-        });
+        let milestone_poll = &mut self.milestone_poll;
+        milestone_poll.total_vote_count = milestone_poll.total_vote_count.checked_add(1).unwrap();
 
+        self.milestone_poll_vote.set_inner(MilestonePollVote {
+            voter: self.signer.key(),
+            vote,
+            bump: bumps.milestone_poll_vote,
+        });
         Ok(())
     }
 }

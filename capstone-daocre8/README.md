@@ -13,12 +13,11 @@ DAOCre-8 (pronounced as /daʊ- krē- āt/ ; with ‘8’ symbolizing a Lemniscat
 - The creator can initate change polls that will be voted for by the backers for the direction of the project DAO
 - As a Backer, you can support and fund a project DAO and that funding will go to the project DAO's treasury account
 
-## Limitations & Recommendations
+## Limitations
 
 - Actual cNFT minting for creators and backers is yet to be implemented
-- Connection between the cNFT and the project DAO owned by a creator is yet to be established
-- Connection between the cNFT and the project DAO's reward funded by a backer is yet to be established
-- Voting for polls is not yet implemented
+- Connection and token-gating between the cNFT and the project DAO owned by a creator is yet to be established
+- Connection and token-gating between the cNFT and the project DAO's reward funded by a backer is yet to be established
 
 ## Accounts / Addresses & Links
 
