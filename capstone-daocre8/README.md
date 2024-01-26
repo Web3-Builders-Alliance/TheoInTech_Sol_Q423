@@ -6,12 +6,18 @@ DAOCre-8 (pronounced as /daʊ- krē- āt/ ; with ‘8’ symbolizing a Lemniscat
 
 ## Features
 
-- As a Creator, you can create a project DAO where you can set its details, milestones and rewards
+### As a Creator
+
+- The creator can create a project DAO where you can set its details, milestones and rewards
 - The creator will be able to pay for the project DAO's processing fee and will be put into the DAOCre-8 vault
 - The creator can post project updates to their backers
 - The creator can initate milestone polls that will be voted for by the backers to release the fund
 - The creator can initate change polls that will be voted for by the backers for the direction of the project DAO
-- As a Backer, you can support and fund a project DAO and that funding will go to the project DAO's treasury account
+
+### As a Backer
+
+- The backer can support and fund a project DAO and that funding will go to the project DAO's treasury account
+- The backer can vote on milestone polls and project change polls
 
 ## Limitations
 
