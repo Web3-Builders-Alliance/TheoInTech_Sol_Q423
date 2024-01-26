@@ -32,6 +32,7 @@ pub mod capstone_daocre8 {
         reward_idx: String,
         price: u64,
         reward_metadata: String,
+        vote_weight: u8,
         // Deposit fee
         fee: u64
     ) -> Result<()> {
@@ -53,7 +54,7 @@ pub mod capstone_daocre8 {
             milestone_metadata,
             &ctx.bumps
         );
-        ctx.accounts.create_reward(reward_idx, price, reward_metadata, &ctx.bumps);
+        ctx.accounts.create_reward(reward_idx, price, reward_metadata, vote_weight, &ctx.bumps);
         ctx.accounts.deposit_fee(fee)
     }
 }

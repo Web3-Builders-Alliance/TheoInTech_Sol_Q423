@@ -2,17 +2,18 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Milestone {
+    pub milestone_idx: String,
     pub project: Pubkey,
     pub fund_disbursed: u64,
     pub receiver: Pubkey,
     pub deadline: u64,
     pub milestone_metadata: String,
     pub bump: u8,
-    // pub milestone_poll_bump: u8,
+    // pub milestone_poll_bump: Option<u8>,
 }
 
 impl Space for Milestone {
-    const INIT_SPACE: usize = 8 + 32 + 8 + 32 + 8 + (4 + 32) + 1;
+    const INIT_SPACE: usize = 8 + (4 + 32) + 32 + 8 + 32 + 8 + (4 + 32) + 1;
 }
 
 #[account]
