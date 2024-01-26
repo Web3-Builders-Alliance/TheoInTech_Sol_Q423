@@ -104,7 +104,6 @@ impl<'info> Create<'info> {
         funding_start_date: u64,
         funding_end_date: u64,
         detail_metadata: String,
-        updates_metadata: String,
         bumps: &CreateBumps
     ) -> Result<()> {
         require!(
@@ -125,7 +124,7 @@ impl<'info> Create<'info> {
             funding_start_date,
             funding_end_date,
             detail_metadata,
-            updates_metadata,
+            number_of_updates: 0,
             bump: bumps.project_dao,
             treasury_bump: bumps.treasury,
             milestone_bump: bumps.milestone,

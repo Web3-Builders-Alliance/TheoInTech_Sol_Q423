@@ -9,7 +9,7 @@ pub struct ProjectDAO {
     pub funding_start_date: u64,
     pub funding_end_date: u64,
     pub detail_metadata: String,
-    pub updates_metadata: String,
+    pub number_of_updates: u64,
     pub bump: u8,
     pub treasury_bump: u8,
     pub milestone_bump: u8,
@@ -18,5 +18,15 @@ pub struct ProjectDAO {
 
 impl Space for ProjectDAO {
     const INIT_SPACE: usize =
-        8 + 32 + (4 + 32) + 8 + 8 + 8 + 8 + (4 + 32) + (4 + 32) + 1 + 1 + 1 + 1;
+        8 + 32 + (4 + 32) + 8 + 8 + 8 + 8 + (4 + 32) + (4 + 32) + 8 + 1 + 1 + 1 + 1;
+}
+
+#[account]
+pub struct ProjectDAOUpdate {
+    pub update_metadata: String,
+    pub bump: u8,
+}
+
+impl Space for ProjectDAOUpdate {
+    const INIT_SPACE: usize = 8 + (4 + 32) + 1;
 }

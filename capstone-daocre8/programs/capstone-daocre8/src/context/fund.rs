@@ -11,17 +11,7 @@ pub use crate::errors::{ ProjectDAOError, RewardError };
 #[instruction(project_dao_idx: String, creator: Pubkey, reward_idx: String)]
 pub struct Fund<'info> {
     #[account(mut)]
-    signer: Signer<'info>,
-    /*
-     * DAOCre-8 Vault
-     */
-    #[account(mut, seeds = [b"daocre-8"], bump)]
-    vault: SystemAccount<'info>,
-    /*
-     * Creator
-     */
-    #[account(seeds = [b"creator", creator.key().as_ref()], bump = creator.bump)]
-    creator: Account<'info, Creator>,
+    backer: Signer<'info>,
     /*
      * ProjectDAO
      * qq: If I want the ProjectDAO to be token-gated using the NFT given to the creator, should I simply add it as a constraint or as part of a seed? What's the difference?
@@ -43,11 +33,11 @@ pub struct Fund<'info> {
     reward: Account<'info, Reward>,
     #[account(
         init,
-        payer = signer,
+        payer = backer,
         space = RewardBacked::INIT_SPACE,
         seeds = [
             b"reward_backed",
-            signer.key().as_ref(),
+            backer.key().as_ref(),
             reward.key().as_ref(),
             project_dao.key().as_ref(),
         ],
@@ -68,13 +58,13 @@ impl<'info> Fund<'info> {
 
         // Set the reward backed account
         self.reward_backed.set_inner(RewardBacked {
-            backer: self.signer.key(),
+            backer: self.backer.key(),
             bump: bumps.reward_backed,
         });
 
         // Transfer the SOL from the backer to the treasury
         let accounts = Transfer {
-            from: self.signer.to_account_info(),
+            from: self.backer.to_account_info(),
             to: self.treasury.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(self.system_program.to_account_info(), accounts);

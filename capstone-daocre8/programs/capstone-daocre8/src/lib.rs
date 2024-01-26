@@ -22,7 +22,6 @@ pub mod capstone_daocre8 {
         funding_start_date: u64,
         funding_end_date: u64,
         detail_metadata: String,
-        updates_metadata: String,
         // Milestones
         milestone_idx: String,
         fund_disbursed: u64,
@@ -44,7 +43,6 @@ pub mod capstone_daocre8 {
             funding_start_date,
             funding_end_date,
             detail_metadata,
-            updates_metadata,
             &ctx.bumps
         );
         ctx.accounts.create_milestone(
@@ -56,5 +54,14 @@ pub mod capstone_daocre8 {
         );
         ctx.accounts.create_reward(reward_idx, price, reward_metadata, vote_weight, &ctx.bumps);
         ctx.accounts.deposit_fee(fee)
+    }
+
+    pub fn fund(ctx: Context<Fund>) -> Result<()> {
+        ctx.accounts.fund_project(&ctx.bumps);
+        ctx.accounts.mint_project_nft(&ctx.bumps)
+    }
+
+    pub fn post_update(ctx: Context<PostUpdate>, update_metadata: String) -> Result<()> {
+        ctx.accounts.post_update(update_metadata, &ctx.bumps)
     }
 }
