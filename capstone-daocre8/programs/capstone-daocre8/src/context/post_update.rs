@@ -42,7 +42,7 @@ pub struct PostUpdate<'info> {
 
 impl<'info> PostUpdate<'info> {
     pub fn post_update(&mut self, update_metadata: String, bumps: &PostUpdateBumps) -> Result<()> {
-        // Increment the number of backers on the reward
+        // Increment the number of updates on the project DAO
         let project_dao = &mut self.project_dao;
         project_dao.number_of_updates = project_dao.number_of_updates.checked_add(1).unwrap();
 

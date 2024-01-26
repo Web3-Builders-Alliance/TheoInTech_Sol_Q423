@@ -18,16 +18,17 @@ impl Space for Milestone {
 
 #[account]
 pub struct MilestonePoll {
+    pub milestone_poll_idx: String,
     pub poll_start_date: u64,
     pub poll_end_date: u64,
     pub milestone_polls_metadata: String,
     pub vote_count: u16,
     pub bump: u8,
-    pub vote_bump: u8,
+    // pub vote_bump: u8,
 }
 
 impl Space for MilestonePoll {
-    const INIT_SPACE: usize = 8 + 8 + 8 + (4 + 32) + 2 + 1 + 1;
+    const INIT_SPACE: usize = 8 + (4 + 32) + 8 + 8 + (4 + 32) + 2 + 1 + 1;
 }
 
 #[account]

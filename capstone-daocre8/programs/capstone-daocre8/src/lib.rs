@@ -64,4 +64,38 @@ pub mod capstone_daocre8 {
     pub fn post_update(ctx: Context<PostUpdate>, update_metadata: String) -> Result<()> {
         ctx.accounts.post_update(update_metadata, &ctx.bumps)
     }
+
+    pub fn post_change_poll(
+        ctx: Context<PostChangePoll>,
+        change_poll_idx: String,
+        poll_start_date: u64,
+        poll_end_date: u64,
+        metadata: String
+    ) -> Result<()> {
+        ctx.accounts.post_change_poll(
+            change_poll_idx,
+            poll_start_date,
+            poll_end_date,
+            metadata,
+            &ctx.bumps
+        )
+    }
+
+    pub fn post_milestone_poll(
+        ctx: Context<PostMilestonePoll>,
+        milestone_idx: String,
+        milestone_poll_idx: String,
+        poll_start_date: u64,
+        poll_end_date: u64,
+        milestone_polls_metadata: String
+    ) -> Result<()> {
+        ctx.accounts.post_milestone_poll(
+            milestone_idx,
+            milestone_poll_idx,
+            poll_start_date,
+            poll_end_date,
+            milestone_polls_metadata,
+            &ctx.bumps
+        )
+    }
 }
