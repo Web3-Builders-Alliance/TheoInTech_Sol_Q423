@@ -24,6 +24,7 @@ DAOCre-8 (pronounced as /daʊ- krē- āt/ ; with ‘8’ symbolizing a Lemniscat
 - Actual cNFT minting for creators and backers is yet to be implemented
 - Connection and token-gating between the cNFT and the project DAO owned by a creator is yet to be established
 - Connection and token-gating between the cNFT and the project DAO's reward funded by a backer is yet to be established
+- Release of funds once milestone is voted positively after the voting period is not yet implemented
 
 ## Accounts / Addresses & Links
 
